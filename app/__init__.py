@@ -2,7 +2,7 @@
 File: app/__init__.py
 Description: Flask application factory and configuration
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: [Update this date]
+Date: November 27, 2025
 """
 
 from flask import Flask
@@ -35,6 +35,17 @@ def create_app():
     # For now, we will only register a simple 'main' blueprint so something works.
     from app.routes.main import main_bp
     app.register_blueprint(main_bp)
+
+    from app.routes.auth_routes import auth_bp
+    app.register_blueprint(auth_bp)
+
+    from app.models import (
+    User, Customer, Vendor, Admin, Address,
+    Product, SKU,
+    Cart, CartItem,
+    Order, OrderItem, PaymentRecord,
+    Review
+    )
 
     # Create database tables
     with app.app_context():
