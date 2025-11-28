@@ -4,7 +4,7 @@ Description: User entity models for the Multi-Brand Clothing Sales Platform.
              Implements User base class with Customer, Vendor, and Admin subclasses
              using single-table inheritance. Also includes Address model.
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: [Update this date]
+Date: November 27, 2025
 """
 
 import uuid
