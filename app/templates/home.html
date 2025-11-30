@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Multi-Brand Clothing Platform{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="max-width: 800px; margin-top: 60px;">
+    <h1 style="font-size: 48px; margin-bottom: 20px;">Welcome to the Multi-Brand Clothing Platform</h1>
+    
+    <p style="font-size: 20px; color: #6c757d; margin-bottom: 40px; line-height: 1.6;">
+        Discover and shop from a curated collection of clothing brands all in one place. 
+        Browse the latest styles, compare products across vendors, and find your perfect fit.
+    </p>
+
+    <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 60px;">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 15px 40px; font-size: 18px; font-weight: bold;">
+            Login
+        </a>
+        <a href="{{ url_for('auth.register_customer') }}" class="btn btn-success" style="padding: 15px 40px; font-size: 18px; font-weight: bold;">
+            Register as Customer
+        </a>
+    </div>
+
+    <div style="margin-top: 60px; padding: 40px; background-color: #f8f9fa; border-radius: 8px;">
+        <h2 style="margin-bottom: 20px;">Are you a vendor?</h2>
+        <p style="color: #555; margin-bottom: 20px;">
+            Join our platform to reach more customers and grow your business.
+        </p>
+        <a href="{{ url_for('auth.register_vendor') }}" class="btn btn-secondary" style="padding: 12px 30px; font-size: 16px;">
+            Register as Vendor
+        </a>
+    </div>
+
+    <div style="margin-top: 60px; padding: 40px;">
+        <h3 style="margin-bottom: 30px;">Why Shop With Us?</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: center;">
+            <div>
+                <div style="font-size: 48px; margin-bottom: 10px;">🛍️</div>
+                <h4>Multiple Brands</h4>
+                <p style="color: #6c757d; font-size: 14px;">Shop from various vendors in one convenient location</p>
+            </div>
+            <div>
+                <div style="font-size: 48px; margin-bottom: 10px;">✨</div>
+                <h4>Quality Products</h4>
+                <p style="color: #6c757d; font-size: 14px;">Curated selection of clothing from trusted vendors</p>
+            </div>
+            <div>
+                <div style="font-size: 48px; margin-bottom: 10px;">🚚</div>
+                <h4>Easy Checkout</h4>
+                <p style="color: #6c757d; font-size: 14px;">Simple and secure shopping experience</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

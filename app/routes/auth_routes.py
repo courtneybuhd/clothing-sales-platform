@@ -1,158 +1,102 @@
 """
 File: app/routes/auth_routes.py
 Description: Authentication routes for the Multi-Brand Clothing Sales Platform.
-             Handles login, logout, and registration for customers and vendors.
+             Handles user login, logout, and registration for customers and vendors.
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: November 27, 2025
+Date: November 29, 2025
 """
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import current_user, login_required
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
+from flask_login import current_user
 from app.controllers.auth_controller import AuthController
+from app.forms.auth_forms import LoginForm, CustomerRegistrationForm, VendorRegistrationForm
 
 
-# Define authentication blueprint
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-# Form classes
-class LoginForm(FlaskForm):
-    """Form for user login."""
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
-
-
-class CustomerRegisterForm(FlaskForm):
-    """Form for customer registration."""
-    name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=6, message='Password must be at least 6 characters')
-    ])
-    confirm_password = PasswordField('Confirm Password', validators=[
-        DataRequired(),
-        EqualTo('password', message='Passwords must match')
-    ])
-    submit = SubmitField('Register')
-
-
-class VendorRegisterForm(FlaskForm):
-    """Form for vendor registration."""
-    name = StringField('Contact Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=6, message='Password must be at least 6 characters')
-    ])
-    confirm_password = PasswordField('Confirm Password', validators=[
-        DataRequired(),
-        EqualTo('password', message='Passwords must match')
-    ])
-    business_name = StringField('Business Name', validators=[DataRequired(), Length(min=2, max=200)])
-    tax_id = StringField('Tax ID', validators=[DataRequired(), Length(min=5, max=50)])
-    submit = SubmitField('Register as Vendor')
-
-
-# Routes
-@auth_bp.route("/login", methods=["GET", "POST"])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Handle user login for all user types (customer, vendor, admin).
+    User login route.
+    Authenticates users and redirects based on role.
     """
-    # Redirect if already authenticated
-    if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
-    
     form = LoginForm()
     
+    if current_user.is_authenticated:
+        if current_user.role == 'customer':
+            return redirect(url_for('customer.catalog'))
+        elif current_user.role == 'vendor':
+            return redirect(url_for('vendor.dashboard'))
+        elif current_user.role == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        else:
+            return redirect(url_for('main.index'))
+    
     if form.validate_on_submit():
-        # Authenticate user
         user = AuthController.authenticate_user(form.email.data, form.password.data)
         
-        if user is None:
-            flash("Invalid email or password. Please try again.", "danger")
-            return render_template("auth/login.html", form=form)
+        if not user:
+            flash('Invalid email or password.', 'danger')
+            return render_template('auth/login.html', form=form)
         
-        # Attempt to log in the user
-        success, error_message = AuthController.login_user_account(user, remember=False)
+        remember = form.remember_me.data if hasattr(form, 'remember_me') else False
+        success, error_message = AuthController.login_user_account(user, remember=remember)
         
         if not success:
-            flash(error_message, "danger")
-            return render_template("auth/login.html", form=form)
+            flash(error_message, 'danger')
+            return render_template('auth/login.html', form=form)
         
-        # Successful login
-        flash(f"Welcome back, {user.name}!", "success")
-        
-        # Redirect to next page if specified, otherwise to index
         next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for("main.index"))
+        if next_page:
+            return redirect(next_page)
+        
+        if user.role == 'customer':
+            return redirect(url_for('customer.catalog'))
+        elif user.role == 'vendor':
+            return redirect(url_for('vendor.dashboard'))
+        elif user.role == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        else:
+            return redirect(url_for('main.index'))
     
-    return render_template("auth/login.html", form=form)
+    return render_template('auth/login.html', form=form)
 
 
-@auth_bp.route("/logout")
-@login_required
-def logout():
-    """
-    Log out the current user.
-    """
-    AuthController.logout_current_user()
-    flash("You have been logged out successfully.", "info")
-    return redirect(url_for("main.index"))
-
-
-@auth_bp.route("/register/customer", methods=["GET", "POST"])
+@auth_bp.route('/register/customer', methods=['GET', 'POST'])
 def register_customer():
     """
-    Handle customer registration.
+    Customer registration route.
+    Creates a new customer account.
     """
-    # Redirect if already authenticated
-    if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
-    
-    form = CustomerRegisterForm()
+    form = CustomerRegistrationForm()
     
     if form.validate_on_submit():
-        # Attempt to register the customer
         customer, error_message = AuthController.register_customer(
             name=form.name.data,
             email=form.email.data,
             password=form.password.data
         )
         
-        if customer is None:
-            flash(error_message, "danger")
-            return render_template("auth/register_customer.html", form=form)
+        if error_message is not None:
+            flash(error_message, 'danger')
+            return render_template('auth/register_customer.html', form=form)
         
-        # Registration successful
-        flash("Account created successfully! Please log in.", "success")
-        
-        # Optionally auto-login the user
-        AuthController.login_user_account(customer, remember=False)
-        
-        return redirect(url_for("main.index"))
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('auth.login'))
     
-    return render_template("auth/register_customer.html", form=form)
+    return render_template('auth/register_customer.html', form=form)
 
 
-@auth_bp.route("/register/vendor", methods=["GET", "POST"])
+@auth_bp.route('/register/vendor', methods=['GET', 'POST'])
 def register_vendor():
     """
-    Handle vendor registration. Vendor accounts require admin approval.
+    Vendor registration route.
+    Creates a new vendor account pending admin approval.
     """
-    # Redirect if already authenticated
-    if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
-    
-    form = VendorRegisterForm()
+    form = VendorRegistrationForm()
     
     if form.validate_on_submit():
-        # Attempt to register the vendor
         vendor, error_message = AuthController.register_vendor(
             name=form.name.data,
             email=form.email.data,
@@ -161,17 +105,22 @@ def register_vendor():
             tax_id=form.tax_id.data
         )
         
-        if vendor is None:
-            flash(error_message, "danger")
-            return render_template("auth/register_vendor.html", form=form)
+        if error_message is not None:
+            flash(error_message, 'danger')
+            return render_template('auth/register_vendor.html', form=form)
         
-        # Vendor registration successful but pending approval
-        flash(
-            "Vendor account created successfully! Your account is pending admin approval. "
-            "You will be notified once approved.",
-            "info"
-        )
-        
-        return redirect(url_for("auth.login"))
+        flash('Vendor account created successfully! Your account is pending admin approval.', 'info')
+        return redirect(url_for('auth.login'))
     
-    return render_template("auth/register_vendor.html", form=form)
+    return render_template('auth/register_vendor.html', form=form)
+
+
+@auth_bp.route('/logout')
+def logout():
+    """
+    User logout route.
+    Logs out the current user and redirects to login page.
+    """
+    AuthController.logout_current_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('auth.login'))

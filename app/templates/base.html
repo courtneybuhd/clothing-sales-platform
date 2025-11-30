@@ -20,6 +20,9 @@
             background-color: #343a40;
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .navbar-brand {
             color: #fff;
@@ -29,12 +32,19 @@
             margin-right: 2rem;
         }
         .navbar-nav {
-            display: inline-block;
+            display: flex;
             list-style: none;
+            align-items: center;
+            gap: 1rem;
         }
-        .navbar-nav li {
-            display: inline-block;
-            margin-right: 1rem;
+        .navbar-left {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
         .navbar-nav a {
             color: #adb5bd;
@@ -44,6 +54,10 @@
         }
         .navbar-nav a:hover {
             color: #fff;
+        }
+        .navbar-text {
+            color: #adb5bd;
+            margin-right: 1rem;
         }
         .container {
             max-width: 1200px;
@@ -279,16 +293,38 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="/" class="navbar-brand">Clothing Platform</a>
-        <ul class="navbar-nav">
-            <li><a href="/">Home</a></li>
-            <li><a href="/customer/catalog">Catalog</a></li>
-            <li><a href="/customer/cart">Cart</a></li>
-            <li><a href="/vendor/dashboard">Vendor</a></li>
-            <li><a href="/admin/dashboard">Admin</a></li>
-            <li><a href="/auth/login">Login</a></li>
-            <li><a href="/auth/logout">Logout</a></li>
-        </ul>
+        <div class="navbar-left">
+            <a href="{{ url_for('main.index') }}" class="navbar-brand">Clothing Platform</a>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    {% if current_user.role == 'customer' %}
+                        <li><a href="{{ url_for('customer.catalog') }}">Catalog</a></li>
+                        <li><a href="{{ url_for('customer.view_cart') }}">Cart</a></li>
+                    {% endif %}
+                    {% if current_user.role == 'vendor' %}
+                        <li><a href="{{ url_for('vendor.dashboard') }}">Vendor Dashboard</a></li>
+                    {% endif %}
+                    {% if current_user.role == 'admin' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('customer.catalog') }}">Catalog</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                    <li class="navbar-text">Welcome back, {{ current_user.name }}!</li>
+                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('auth.register_customer') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
     </nav>
 
     <div class="container">

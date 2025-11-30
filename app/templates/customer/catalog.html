@@ -10,15 +10,13 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
             {% for product in products %}
                 <div class="card">
-                    {% if product.image_url %}
-                        <div style="width: 100%; height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                            <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
-                        </div>
-                    {% else %}
-                        <div style="width: 100%; height: 200px; background-color: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                            <span>No Image</span>
-                        </div>
-                    {% endif %}
+                    <div style="width: 100%; height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                        {% if product.image_url %}
+                            <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                        {% endif %}
+                    </div>
                     <div class="card-body">
                         <h5 style="margin-top: 0;">{{ product.name }}</h5>
                         <p style="color: #6c757d; font-size: 14px; margin: 5px 0;">{{ product.category }}</p>
