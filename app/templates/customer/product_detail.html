@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            text-align: center;
+        }
+        .nav {
+            background-color: #495057;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .product-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .product-image {
+            width: 100%;
+            height: 400px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+        .product-info h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .product-category {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 32px;
+            color: #28a745;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .product-description {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .rating {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .stars {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+        .sku-section {
+            margin: 20px 0;
+        }
+        .sku-section h4 {
+            margin-bottom: 10px;
+        }
+        .sku-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .sku-option {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sku-option:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .sku-option input[type="radio"] {
+            margin-right: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .reviews-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .reviews-section h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .review-card {
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+        }
+        .review-card:last-child {
+            border-bottom: none;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .review-author {
+            font-weight: bold;
+        }
+        .review-date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .review-rating {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+        .review-comment {
+            color: #555;
+            line-height: 1.6;
+        }
+        .review-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .review-form h4 {
+            margin-top: 0;
+        }
+        .no-reviews {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Multi-Brand Clothing Sales Platform</h1>
+    </div>
+
+    <div class="nav">
+        <div class="container">
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('customer.catalog') }}">Catalog</a>
+            <a href="{{ url_for('customer.view_cart') }}">Cart</a>
+            <a href="{{ url_for('customer.order_history') }}">My Orders</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="product-container">
+            <div class="product-image">
+                <span>Product Image</span>
+            </div>
+
+            <div class="product-info">
+                <p class="product-category">{{ product.category }}</p>
+                <h2>{{ product.name }}</h2>
+                
+                <div class="rating">
+                    <span class="stars">
+                        {% for i in range(5) %}
+                            {% if i < average_rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>({{ average_rating|round(1) }} / 5.0)</span>
+                </div>
+
+                <p class="product-price">${{ "%.2f"|format(product.base_price) }}</p>
+
+                <div class="product-description">
+                    <h4>Description</h4>
+                    <p>{{ product.description or "No description available." }}</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('customer.add_to_cart') }}">
+                    <div class="sku-section">
+                        <h4>Select Size & Color</h4>
+                        {% if product.skus %}
+                            <div class="sku-grid">
+                                {% for sku in product.skus %}
+                                    <label class="sku-option">
+                                        <input type="radio" name="sku_id" value="{{ sku.id }}" required>
+                                        {{ sku.color }} / {{ sku.size }}
+                                        <br>
+                                        <small>Stock: {{ sku.inventory }}</small>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No variants available.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="10" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h3>Customer Reviews ({{ reviews|length }})</h3>
+
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-author">{{ review.customer.name }}</span>
+                            <span class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                        <div class="review-rating">
+                            {% for i in range(5) %}
+                                {% if i < review.rating %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% if review.comment %}
+                            <p class="review-comment">{{ review.comment }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-reviews">
+                    <p>No reviews yet. Be the first to review this product!</p>
+                </div>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.role == 'customer' %}
+                <div class="review-form">
+                    <h4>Write a Review</h4>
+                    <form method="POST" action="{{ url_for('customer.submit_review', product_id=product.id) }}">
+                        <div class="form-group">
+                            <label for="rating">Rating</label>
+                            <select id="rating" name="rating" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">★★★★★ (5 stars)</option>
+                                <option value="4">★★★★☆ (4 stars)</option>
+                                <option value="3">★★★☆☆ (3 stars)</option>
+                                <option value="2">★★☆☆☆ (2 stars)</option>
+                                <option value="1">★☆☆☆☆ (1 star)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comment">Comment (optional)</label>
+                            <textarea id="comment" name="comment" rows="4" placeholder="Share your experience with this product..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Submit Review</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="review-form">
+                    <p><a href="{{ url_for('auth.login') }}">Login</a> to write a review.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

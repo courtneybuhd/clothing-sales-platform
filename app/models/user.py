@@ -4,7 +4,7 @@ Description: User entity models for the Multi-Brand Clothing Sales Platform.
              Implements User base class with Customer, Vendor, and Admin subclasses
              using single-table inheritance. Also includes Address model.
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: November 27, 2025
+Date: November 29, 2025
 """
 
 import uuid
@@ -38,6 +38,13 @@ class User(UserMixin, db.Model):
     
     # Timestamp
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationship: all users may have addresses (only customers will use it)
+    addresses = db.relationship(
+        'Address',
+        back_populates='user',
+        cascade='all, delete-orphan'
+    )
     
     # Single-table inheritance configuration
     __mapper_args__ = {
@@ -89,9 +96,6 @@ class Customer(User):
     }
     
     # Relationships to other entities
-    # FIXED: back_populates now points to 'user' not 'customer'
-    addresses = db.relationship('Address', back_populates='user',
-                               cascade='all, delete-orphan')
     carts = db.relationship('Cart', back_populates='customer')
     orders = db.relationship('Order', back_populates='customer')
     reviews = db.relationship('Review', back_populates='customer')
