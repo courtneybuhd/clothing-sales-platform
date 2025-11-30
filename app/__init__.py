@@ -2,7 +2,7 @@
 File: app/__init__.py
 Description: Flask application factory and configuration
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: November 27, 2025
+Date: November 29, 2025
 """
 
 from flask import Flask
@@ -31,24 +31,30 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
 
-    # ---- TEMPORARY: we'll register real blueprints later ----
-    # For now, we will only register a simple 'main' blueprint so something works.
+    # Import models to ensure they're registered with SQLAlchemy
+    from app.models import (
+        User, Customer, Vendor, Admin, Address,
+        Product, SKU,
+        Cart, CartItem,
+        Order, OrderItem, PaymentRecord,
+        Review
+    )
+
+    # Register blueprints
     from app.routes.main import main_bp
     app.register_blueprint(main_bp)
 
     from app.routes.auth_routes import auth_bp
     app.register_blueprint(auth_bp)
 
-    from app.models import (
-    User, Customer, Vendor, Admin, Address,
-    Product, SKU,
-    Cart, CartItem,
-    Order, OrderItem, PaymentRecord,
-    Review
-    )
-
     from app.routes.customer import customer_bp
     app.register_blueprint(customer_bp)
+
+    from app.routes.vendor import vendor_bp
+    app.register_blueprint(vendor_bp)
+
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp)
 
     # Create database tables
     with app.app_context():
@@ -60,6 +66,4 @@ def create_app():
 def load_user(user_id):
     """Required by Flask-Login to reload user from session"""
     from app.models.user import User
-    # For now, we'll stub this until we create the User model
-    # Return None so login-dependent stuff is disabled
-    return None
+    return User.query.get(user_id)

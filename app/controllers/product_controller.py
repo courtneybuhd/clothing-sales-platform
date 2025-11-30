@@ -3,7 +3,7 @@ File: app/controllers/product_controller.py
 Description: Product and SKU management controller for the Multi-Brand Clothing Sales Platform.
              Provides create, read, update, delete operations for products and SKU variants.
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: November 27, 2025
+Date: November 29, 2025
 """
 
 from datetime import datetime
@@ -19,7 +19,7 @@ class ProductController:
     """
     
     @staticmethod
-    def create_product(vendor, name, description, category, base_price, available=True):
+    def create_product(vendor, name, description, category, base_price, available=True, image_url=None):
         """
         Create a new product for a vendor.
         
@@ -30,6 +30,7 @@ class ProductController:
             category (str): Product category
             base_price (Decimal): Base price for the product
             available (bool): Whether product is available for purchase
+            image_url (str, optional): URL to product image
             
         Returns:
             Product: The newly created product
@@ -40,7 +41,8 @@ class ProductController:
             description=description,
             category=category,
             base_price=base_price,
-            available=available
+            available=available,
+            image_url=image_url
         )
         
         try:
@@ -59,7 +61,7 @@ class ProductController:
         Args:
             product_id (str): UUID of the product to update
             **fields: Keyword arguments for fields to update
-                     (name, description, category, base_price, available)
+                     (name, description, category, base_price, available, image_url)
             
         Returns:
             Product: Updated product object, or None if not found
@@ -70,11 +72,11 @@ class ProductController:
             return None
         
         # Allowed fields for update
-        allowed_fields = ['name', 'description', 'category', 'base_price', 'available']
+        allowed_fields = ['name', 'description', 'category', 'base_price', 'available', 'image_url']
         
         # Update only allowed fields
         for field, value in fields.items():
-            if field in allowed_fields:
+            if field in allowed_fields and value is not None:
                 setattr(product, field, value)
         
         # Update the timestamp
@@ -232,3 +234,25 @@ class ProductController:
             query = query.filter_by(available=True)
         
         return query.order_by(Product.created_at.desc()).all()
+    
+    @staticmethod
+    def list_all_available_products():
+        """
+        List all products that are available and have at least one SKU with inventory.
+        This is used for the customer catalog to show all browsable products across vendors.
+        
+        Returns:
+            list: List of available Product objects that have inventory
+        """
+        # Get all products marked as available
+        available_products = Product.query.filter_by(available=True).all()
+        
+        # Filter to only include products with at least one SKU that has inventory > 0
+        products_with_inventory = []
+        for product in available_products:
+            # Check if product has any SKU with inventory
+            has_inventory = any(sku.inventory > 0 for sku in product.skus)
+            if has_inventory:
+                products_with_inventory.append(product)
+        
+        return products_with_inventory

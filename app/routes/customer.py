@@ -6,7 +6,7 @@ Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
 Date: November 29, 2025
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.utils.decorators import role_required
 from app.controllers.product_controller import ProductController
@@ -25,12 +25,13 @@ def catalog():
     Allows browsing products by category, price range, and availability.
     """
     category = request.args.get('category')
-    only_available = request.args.get('available', 'true').lower() == 'true'
     
     if category:
-        products = ProductController.list_products_by_category(category, only_available=only_available)
+        # If a specific category is requested, filter by that category
+        products = ProductController.list_products_by_category(category, only_available=True)
     else:
-        products = []
+        # Show all available products across all vendors
+        products = ProductController.list_all_available_products()
     
     return render_template('customer/catalog.html', products=products, category=category)
 

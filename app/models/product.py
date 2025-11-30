@@ -3,7 +3,7 @@ File: app/models/product.py
 Description: Product and SKU entity models for the Multi-Brand Clothing Sales Platform.
              Implements Product catalog with variant SKUs for size/color combinations.
 Team: Xavier Buentello, Parmida Keymanesh, Courtney Buttler, David Rosas
-Date: November 27, 2025
+Date: November 29, 2025
 """
 
 import uuid
@@ -29,6 +29,9 @@ class Product(db.Model):
     description = db.Column(db.Text)
     category = db.Column(db.String(100), nullable=False, index=True)
     base_price = db.Column(db.Numeric(10, 2), nullable=False)
+    
+    # Optional product image URL
+    image_url = db.Column(db.String(500))
     
     # Availability flag
     available = db.Column(db.Boolean, default=True, nullable=False)
@@ -148,3 +151,4 @@ class SKU(db.Model):
     
     def __repr__(self):
         return f'<SKU {self.product.name if self.product else "Unknown"} - {self.color}/{self.size}>'
+    
